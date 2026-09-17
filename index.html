@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#151513">
+<title>Gurukrupa Fencing Work — Job Ledger 2.2</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-storage-compat.js"></script>
+
+<style>
+:root{
+  --ink:#171714;
+  --ink2:#24231f;
+  --paper:#f5f0e6;
+  --paper2:#fffdf7;
+  --line:#d9d0c1;
+  --muted:#766f64;
+  --rust:#b64d2c;
+  --rust2:#d86a42;
+  --moss:#566b42;
+  --gold:#b28a3b;
+  --red:#b83d35;
+  --green:#4e7651;
+  --shadow:0 12px 35px rgba(20,18,14,.10);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+body{min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:
+    radial-gradient(circle at 10% 10%,rgba(182,77,44,.14),transparent 32%),
+    radial-gradient(circle at 90% 90%,rgba(86,107,66,.15),transparent 32%),var(--ink);
+}
+.login-card{width:100%;max-width:430px;background:var(--paper2);border-radius:26px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.35)}
+.brand-mark{width:58px;height:58px;border-radius:17px;background:var(--ink);display:grid;place-items:center;color:#fff;font-size:25px;font-weight:800;margin-bottom:20px}
+.login-card h1{font-family:Oswald,sans-serif;font-size:32px;line-height:1;margin:0 0 8px;text-transform:uppercase}
+.login-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 24px}
+.app{display:none;min-height:100vh;padding-bottom:92px}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(245,240,230,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:720px;margin:auto;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:11px}
+.logo{width:42px;height:42px;border-radius:13px;background:var(--ink);color:white;display:grid;place-items:center;font-weight:800;font-size:17px}
+.brand-title{font-family:Oswald,sans-serif;font-size:19px;text-transform:uppercase;letter-spacing:.4px}
+.brand-sub{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1px}
+.icon-btn{width:40px;height:40px;border:1px solid var(--line);background:var(--paper2);border-radius:12px;font-size:17px}
+main{max-width:720px;margin:auto;padding:18px 16px}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:10px 0 16px}
+.section-head h2{font-family:Oswald,sans-serif;font-size:28px;text-transform:uppercase;margin:0}
+.section-head p{font-size:11px;color:var(--muted);margin:3px 0 0}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.btn-primary{background:var(--ink);color:white}
+.btn-google{background:#fff;color:#202124;border:1px solid #dadce0;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.btn-google:hover{background:#f8f9fa}
+.btn-google:disabled{opacity:.65;cursor:not-allowed}
+.google-g{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-weight:900;font-size:16px;font-family:Arial,sans-serif}
+.firebase-ok{color:#39613b;font-weight:700}
+.firebase-wait{color:#73591e;font-weight:700}
+.firebase-bad{color:#8c2721;font-weight:700}
+.status-box{margin-top:8px;background:#eee7db;border-radius:10px;padding:10px;line-height:1.55}
+.btn-rust{background:var(--rust);color:white}
+.btn-soft{background:var(--paper2);color:var(--ink);border:1px solid var(--line)}
+.btn-danger{background:#f5dcd8;color:#8c2721}
+.btn-green{background:var(--green);color:white}
+.btn-small{padding:8px 10px;font-size:11px}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.full{grid-column:1/-1}
+label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.7px;font-weight:800;color:var(--muted);margin:0 0 6px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:#fffefa;border-radius:11px;padding:11px 12px;outline:none;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:var(--rust);box-shadow:0 0 0 3px rgba(182,77,44,.10)}
+textarea{min-height:78px;resize:vertical}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat-label{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:800}
+.stat-value{font-family:Oswald,sans-serif;font-size:25px;margin-top:5px}
+.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.stat.rust{border-left:4px solid var(--rust)}
+.stat.green{border-left:4px solid var(--green)}
+.stat.gold{border-left:4px solid var(--gold)}
+.stat.moss{border-left:4px solid var(--moss)}
+.wide-stat{grid-column:1/-1}
+.money{font-variant-numeric:tabular-nums}
+.empty{padding:28px 10px;text-align:center;color:var(--muted);font-size:12px}
+.list{display:grid;gap:10px}
+.item{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:14px}
+.item-top{display:flex;justify-content:space-between;gap:10px}
+.item-title{font-weight:800;font-size:14px}
+.item-sub{font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px}
+.item-right{text-align:right}
+.item-amount{font-family:Oswald,sans-serif;font-size:21px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:800;background:#ece6da;color:#4f493f}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.status{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:800}
+.status.pending{background:#f6e5bc;color:#73591e}.status.progress{background:#dfe9f5;color:#31577c}.status.completed{background:#dcebdc;color:#39613b}
+.item-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.progress{height:7px;background:#e5ded1;border-radius:99px;overflow:hidden;margin-top:10px}
+.progress>span{height:100%;display:block;background:var(--green)}
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.search-row input{flex:1}
+.worker-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.worker-check{border:1px solid var(--line);border-radius:13px;padding:10px;background:#fffefa;display:flex;align-items:center;gap:8px}
+.worker-check input{width:auto}
+.worker-card{position:relative;overflow:hidden}
+.worker-bar{position:absolute;left:0;top:0;bottom:0;width:5px}
+.worker-card-main{padding-left:5px}
+.color-row{display:flex;gap:8px;flex-wrap:wrap}
+.color-choice input{display:none}
+.color-choice span{display:block;width:29px;height:29px;border-radius:50%;border:3px solid transparent}
+.color-choice input:checked+span{border-color:var(--ink);box-shadow:0 0 0 2px var(--paper2) inset}
+.doc-icon{width:43px;height:43px;border-radius:12px;background:#eee7db;display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.doc-row{display:flex;gap:11px;align-items:flex-start}
+.bottom-nav{position:fixed;z-index:50;bottom:0;left:0;right:0;background:rgba(255,253,247,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.nav-inner{max-width:720px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 7px 9px}
+.nav-btn{border:0;background:transparent;color:var(--muted);font-size:9px;font-weight:800;padding:7px 2px;border-radius:11px}
+.nav-btn .ico{font-size:18px;display:block;margin-bottom:3px}
+.nav-btn.active{background:var(--ink);color:white}
+.toast{position:fixed;z-index:100;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:#fff;padding:11px 15px;border-radius:12px;font-size:11px;font-weight:700;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.loading{position:fixed;inset:0;background:rgba(23,23,20,.35);z-index:90;display:grid;place-items:center}
+.loader-card{background:var(--paper2);padding:20px;border-radius:16px;font-weight:800;font-size:12px}
+.auth-note{font-size:10px!important;background:#eee7db;padding:10px;border-radius:10px;margin-top:14px!important}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.small{font-size:10px;color:var(--muted)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700}
+.toggle input{width:auto}
+.summary-line{display:flex;justify-content:space-between;padding:7px 0;font-size:12px;border-bottom:1px dashed var(--line)}
+.summary-line:last-child{border-bottom:0}
+@media(min-width:650px){
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .wide-stat{grid-column:auto}
+}
+@media(max-width:420px){
+  .form-grid,.worker-grid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  .section-head h2{font-size:24px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="brand-mark">GF</div>
+    <h1>Gurukrupa<br>Fencing Work</h1>
+    <p>Private business ledger for orders, workers, owners, payments and important documents.</p>
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="loginEmail" type="email" placeholder="Owner email" autocomplete="username" required>
+      <br><br>
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" required>
+      <div class="form-actions">
+        <button class="btn btn-primary" style="width:100%" type="submit" id="loginBtn">Sign In with Email</button>
+        <button class="btn btn-google" style="width:100%" type="button" id="googleBtn"><span class="google-g">G</span> Continue with Google</button>
+        <button class="btn btn-soft" style="width:100%" type="button" id="forgotBtn">Forgot Password</button>
+      </div>
+    </form>
+    <p class="auth-note">Owners can sign in with their Firebase Email/Password account or an authorized Google account. Both see the same shared business records.</p>
+    <div id="firebaseStatus" class="small" style="margin-top:10px"></div>
+    <div id="loginError" class="small" style="color:#a52e27;margin-top:10px"></div>
+    <button class="btn btn-soft" style="width:100%;margin-top:10px" type="button" id="testFirebaseBtn">Test Firebase Connection</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">GF</div>
+        <div>
+          <div class="brand-title">Gurukrupa Fencing</div>
+          <div class="brand-sub">JOB LEDGER · 2.2</div>
+        </div>
+      </div>
+      <button class="icon-btn" onclick="logout()" title="Logout">↪</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboardTab" class="tab">
+      <div class="section-head">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Business snapshot at a glance</p>
+        </div>
+        <button class="btn btn-rust" onclick="openOrderForm()">+ Order</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat rust"><div class="stat-label">Customer Received</div><div class="stat-value money" id="sReceived">₹0</div><div class="stat-note">Cash received</div></div>
+        <div class="stat"><div class="stat-label">Order Value</div><div class="stat-value money" id="sOrderValue">₹0</div><div class="stat-note">All orders</div></div>
+        <div class="stat gold"><div class="stat-label">Customer Pending</div><div class="stat-value money" id="sPending">₹0</div><div class="stat-note">Still to collect</div></div>
+        <div class="stat green"><div class="stat-label">Worker Paid</div><div class="stat-value money" id="sWorkerPaid">₹0</div><div class="stat-note">All workers</div></div>
+        <div class="stat moss"><div class="stat-label">Owner Funds</div><div class="stat-value money" id="sOwnerFunds">₹0</div><div class="stat-note">Net capital</div></div>
+        <div class="stat"><div class="stat-label">Cash In Hand</div><div class="stat-value money" id="sCash">₹0</div><div class="stat-note">Received + owner net − worker paid</div></div>
+        <div class="stat wide-stat"><div class="stat-label">Workers</div><div class="stat-value" id="sWorkers">0</div><div class="stat-note" id="sWorkersNote">0 active</div></div>
+        <div class="stat wide-stat"><div class="stat-label">Important Documents</div><div class="stat-value" id="sDocs">0</div><div class="stat-note">Shared with signed-in owners</div></div>
+      </div>
+
+      <div class="section-head" style="margin-top:26px"><div><h2>Recent Activity</h2><p>Latest entries</p></div></div>
+      <div id="recentActivity" class="list"></div>
+    </section>
+
+    <section id="ordersTab" class="tab hidden">
+      <div class="section-head">
+        <div><h2>Orders</h2><p>Customer jobs and worker assignments</p></div>
+        <button class="btn btn-rust" onclick="openOrderForm()">+ New</button>
+      </div>
+      <div id="orderFormCard" class="card hidden">
+        <div class="section-head" style="margin-top:0"><div><h2 id="orderFormTitle">New Order</h2></div><button class="icon-btn" onclick="closeOrderForm()">×</button></div>
+        <form id="orderForm">
+          <input type="hidden" id="orderId">
+          <div class="form-grid">
+            <div><label>Customer Name</label><input id="orderCustomer" required></div>
+            <div><label>Order Date</label><input id="orderDate" type="date" required></div>
+            <div class="full"><label>Work Description</label><textarea id="orderDesc" placeholder="Example: 120 ft chain-link fencing + gate"></textarea></div>
+            <div><label>Status</label><select id="orderStatus"><option>Pending</option><option>In progress</option><option>Completed</option></select></div>
+            <div><label>Total Order Amount</label><input id="orderAmount" type="number" min="0" step="0.01" required></div>
+            <div><label>Amount Received So Far</label><input id="orderReceived" type="number" min="0" step="0.01" value="0"></div>
+          </div>
+          <hr>
+          <label>Assign Workers</label>
+          <div id="workerAssignments" class="worker-grid"></div>
+          <div class="small" id="noWorkerHint" style="margin-top:8px"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Order</button>
+            <button class="btn btn-soft" type="button" onclick="closeOrderForm()">Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="search-row"><input id="orderSearch" placeholder="Search customer, work or worker..." oninput="renderOrders()"><select id="orderFilter" onchange="renderOrders()" style="max-width:145px"><option>All</option><option>Pending</option><option>In progress</option><option>Completed</option></select></div>
+      <div id="ordersList" class="list"></div>
+    </section>
+
+    <section id="workersTab" class="tab hidden">
+      <div class="section-head">
+        <div><h2>Workers</h2><p>Add different worker types and assign their jobs</p></div>
+        <button class="btn btn-rust" onclick="toggleWorkerForm(true)">+ Worker</button>
+      </div>
+      <div id="workerFormCard" class="card hidden">
+        <div class="section-head" style="margin-top:0"><div><h2 id="workerFormTitle">Add Worker</h2></div><button class="icon-btn" onclick="toggleWorkerForm(false)">×</button></div>
+        <form id="workerForm">
+          <input type="hidden" id="workerId">
+          <div class="form-grid">
+            <div><label>Worker Name</label><input id="workerName" required></div>
+            <div><label>Work Type / Role</label><input id="workerRole" placeholder="Welder, installer, painter..." required></div>
+            <div><label>Phone (Optional)</label><input id="workerPhone" type="tel"></div>
+            <div><label>Status</label><select id="workerActive"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+          </div>
+          <label style="margin-top:14px">Name Tag Colour</label>
+          <div class="color-row" id="workerColors"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Worker</button>
+            <button class="btn btn-soft" type="button" onclick="toggleWorkerForm(false)">Cancel</button>
+          </div>
+        </form>
+      </div>
+      <div class="search-row"><input id="workerSearch" placeholder="Search worker or role..." oninput="renderWorkers()"><select id="workerStatusFilter" onchange="renderWorkers()" style="max-width:125px"><option value="all">All</option><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+      <div id="workersList" class="list"></div>
+    </section>
+
+    <section id="ownersTab" class="tab hidden">
+      <div class="section-head">
+        <div><h2>Owners</h2><p>Capital put in and money taken out</p></div>
+      </div>
+      <div class="card">
+        <form id="ownerForm">
+          <div class="form-grid">
+            <div><label>Owner</label><select id="ownerName"></select></div>
+            <div><label>Type</label><select id="ownerType"><option value="in">Put In (Capital)</option><option value="out">Took Out (Drawing)</option></select></div>
+            <div><label>Amount</label><input id="ownerAmount" type="number" min="0" step="0.01" required></div>
+            <div><label>Date</label><input id="ownerDate" type="date" required></div>
+            <div class="full"><label>Note</label><input id="ownerNote" placeholder="Reason / reference"></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-primary" type="submit">Add Entry</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="summary-line"><span id="owner1SummaryName">Owner 1 Net</span><strong id="owner1Net">₹0</strong></div>
+        <div class="summary-line"><span id="owner2SummaryName">Owner 2 Net</span><strong id="owner2Net">₹0</strong></div>
+        <div class="summary-line"><span>Total Net Owner Funds</span><strong id="ownerTotalNet">₹0</strong></div>
+      </div>
+      <div id="ownersList" class="list"></div>
+    </section>
+
+    <section id="documentsTab" class="tab hidden">
+      <div class="section-head">
+        <div><h2>Documents</h2><p>Important business files shared between owners</p></div>
+        <button class="btn btn-rust" onclick="toggleDocumentForm(true)">+ Document</button>
+      </div>
+      <div id="documentFormCard" class="card hidden">
+        <div class="section-head" style="margin-top:0"><div><h2>Upload Document</h2></div><button class="icon-btn" onclick="toggleDocumentForm(false)">×</button></div>
+        <form id="documentForm">
+          <div class="form-grid">
+            <div><label>Document Name</label><input id="docName" placeholder="Example: Customer quotation - Patil Farm" required></div>
+            <div><label>Date</label><input id="docDate" type="date" required></div>
+            <div><label>Category</label><select id="docCategory"><option>Invoice</option><option>Quotation</option><option>Purchase Bill</option><option>Receipt</option><option>Agreement</option><option>Worker Document</option><option>Business Document</option><option>Other</option></select></div>
+            <div><label>Related Order (Optional)</label><select id="docOrder"></select></div>
+            <div class="full"><label>Choose File</label><input id="docFile" type="file" required accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.csv,.txt"></div>
+          </div>
+          <div class="small" style="margin-top:8px">Maximum file size: 20 MB. Use PDF, image or common office documents.</div>
+          <div id="uploadProgressWrap" class="hidden" style="margin-top:12px"><div class="progress"><span id="uploadProgress" style="width:0%"></span></div><div class="small" id="uploadProgressText" style="margin-top:5px">Uploading...</div></div>
+          <div class="form-actions"><button class="btn btn-primary" id="uploadDocBtn" type="submit">Upload & Save</button><button class="btn btn-soft" type="button" onclick="toggleDocumentForm(false)">Cancel</button></div>
+        </form>
+      </div>
+      <div class="search-row"><input id="docSearch" placeholder="Search documents..." oninput="renderDocuments()"><select id="docFilter" onchange="renderDocuments()" style="max-width:145px"><option>All</option><option>Invoice</option><option>Quotation</option><option>Purchase Bill</option><option>Receipt</option><option>Agreement</option><option>Worker Document</option><option>Business Document</option><option>Other</option></select></div>
+      <div id="documentsList" class="list"></div>
+    </section>
+
+    <section id="settingsTab" class="tab hidden">
+      <div class="section-head"><div><h2>Settings</h2><p>Business names and account</p></div></div>
+      <div class="card">
+        <form id="settingsForm">
+          <div class="form-grid">
+            <div><label>Owner 1 Name</label><input id="setOwner1"></div>
+            <div><label>Owner 2 Name</label><input id="setOwner2"></div>
+          </div>
+          <div class="form-actions"><button class="btn btn-primary" type="submit">Save Settings</button></div>
+        </form>
+      </div>
+      <div class="card">
+        <label>Signed-in Account</label>
+        <div id="currentUserEmail" style="font-weight:800;font-size:13px;margin-bottom:12px"></div>
+        <button class="btn btn-danger" onclick="logout()">Sign Out</button>
+      </div>
+      <div class="card">
+        <label>Connection Diagnostics</label>
+        <p class="small">If the login screen does not proceed, go back to the login page and tap <strong>Test Firebase Connection</strong>. It will show whether Authentication and Firestore are reachable.</p>
+      </div>
+      <div class="card">
+        <label>Google Sign-In Setup</label>
+        <p class="small">
+          In Firebase Console, open <strong>Authentication → Sign-in method → Google</strong> and make sure Google is enabled.
+          Also check <strong>Authentication → Settings → Authorized domains</strong> and add the domain where this HTML app is hosted.
+          Google sign-in normally opens a browser popup, so popups must be allowed for the site.
+        </p>
+      </div>
+      <div class="card">
+        <label>Firebase Security</label>
+        <p class="small">Your Firebase web config is okay to use in a browser, but your Firestore and Storage rules must require authentication. Do not use public read/write rules for this private business ledger.</p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-btn active" data-tab="dashboardTab" onclick="showTab('dashboardTab',this)"><span class="ico">⌂</span>Dashboard</button>
+      <button class="nav-btn" data-tab="ordersTab" onclick="showTab('ordersTab',this)"><span class="ico">▤</span>Orders</button>
+      <button class="nav-btn" data-tab="workersTab" onclick="showTab('workersTab',this)"><span class="ico">♙</span>Workers</button>
+      <button class="nav-btn" data-tab="ownersTab" onclick="showTab('ownersTab',this)"><span class="ico">₹</span>Owners</button>
+      <button class="nav-btn" data-tab="documentsTab" onclick="showTab('documentsTab',this)"><span class="ico">▣</span>Docs</button>
+    </div>
+  </nav>
+</div>
+
+<div id="settingsFloating" style="position:fixed;right:16px;top:67px;z-index:31">
+  <button class="icon-btn" onclick="showTab('settingsTab',null)">⚙</button>
+</div>
+
+<div id="loading" class="loading hidden"><div class="loader-card" id="loadingText">Saving...</div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* =========================================================
+   GURUKRUPA FENCING WORK — VERSION 2.2
+   =========================================================
+   FIREBASE SETUP:
+   1. Enable Authentication > Sign-in method > Email/Password.
+   2. Create two owner accounts in Firebase Authentication.
+   3. Enable Firestore Database.
+   4. Enable Storage.
+   5. Replace your Firestore and Storage rules with the rules
+      shown at the bottom of this file.
+   ========================================================= */
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA9cDLKZFwtXOUBUThm9kVIWDdQv-Avq-o",
+  authDomain: "gurukrupa-fencing.firebaseapp.com",
+  projectId: "gurukrupa-fencing",
+  storageBucket: "gurukrupa-fencing.firebasestorage.app",
+  messagingSenderId: "380060021075",
+  appId: "1:380060021075:web:ac511a00eb3040546431a6"
+};
+
+let firebaseReady = false;
+let auth, db, storage, docRef;
+let currentUser = null;
+let unsubscribe = null;
+
+let DATA = {
+  orders: [],
+  workers: [],
+  ownerLedger: [],
+  workerPayments: [],
+  documents: [],
+  settings: {
+    owner1: "Owner 1",
+    owner2: "Owner 2"
+  }
+};
+
+const WORKER_COLORS = [
+  "#b64d2c","#566b42","#2e6f95","#8a5a9e","#b28a3b","#a23e48","#3e7774","#765b3a"
+];
+
+function $(id){ return document.getElementById(id); }
+function uid(prefix="id"){ return prefix+"_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,8); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function money(n){ return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2}); }
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function dateText(d){
+  if(!d) return "-";
+  const x = new Date(d+"T00:00:00");
+  if(Number.isNaN(x.getTime())) return d;
+  return x.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+function fileSize(bytes){
+  if(bytes<1024) return bytes+" B";
+  if(bytes<1024*1024) return (bytes/1024).toFixed(1)+" KB";
+  return (bytes/1024/1024).toFixed(1)+" MB";
+}
+function showToast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(showToast.timer); showToast.timer=setTimeout(()=>t.classList.remove("show"),2400);
+}
+function loading(show,text="Saving..."){
+  $("loadingText").textContent=text;
+  $("loading").classList.toggle("hidden",!show);
+}
+function setDefaults(){
+  $("orderDate").value=today();
+  $("ownerDate").value=today();
+  $("docDate").value=today();
+}
+function safeName(s){ return String(s||"file").replace(/[^a-zA-Z0-9._-]/g,"_").slice(0,100); }
+
+function setFirebaseStatus(text, cls="firebase-wait"){
+  const el=$("firebaseStatus");
+  if(el){el.className="small "+cls;el.innerHTML=text;}
+}
+
+function friendlyFirebaseError(err){
+  const code=err?.code||"";
+  const map={
+    "auth/invalid-credential":"Incorrect email or password.",
+    "auth/invalid-email":"The email address is not valid.",
+    "auth/user-disabled":"This Firebase user has been disabled.",
+    "auth/too-many-requests":"Too many login attempts. Try again later.",
+    "auth/network-request-failed":"Network error. Check your internet connection.",
+    "auth/operation-not-allowed":"The selected Firebase sign-in provider is not enabled.",
+    "auth/popup-blocked":"The Google sign-in popup was blocked by the browser.",
+    "auth/popup-closed-by-user":"Google sign-in was cancelled.",
+    "auth/unauthorized-domain":"This website domain is not authorized in Firebase Authentication.",
+    "auth/account-exists-with-different-credential":"An account already exists with this email using another sign-in method.",
+    "permission-denied":"Firebase permission denied. Check your Firestore/Storage rules.",
+    "failed-precondition":"Firebase service is not configured correctly."
+  };
+  return map[code] || err?.message || "Unknown Firebase error.";
+}
+
+function initFirebase(){
+  setFirebaseStatus("Connecting to Firebase…","firebase-wait");
+  try{
+    if(!window.firebase){
+      throw new Error("Firebase SDK did not load. Check your internet connection.");
+    }
+
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+
+    auth=firebase.auth();
+    db=firebase.firestore();
+    storage=firebase.storage();
+    docRef=db.collection("gurukrupa").doc("ledger");
+    firebaseReady=true;
+
+    setFirebaseStatus("✓ Firebase SDK connected","firebase-ok");
+
+    auth.onAuthStateChanged(async user=>{
+      currentUser=user||null;
+      if(user){
+        $("loginScreen").style.display="none";
+        $("app").style.display="block";
+        $("currentUserEmail").textContent=user.email||"Authenticated user";
+        setFirebaseStatus("✓ Signed in","firebase-ok");
+        await loadData();
+      }else{
+        if(unsubscribe) unsubscribe();
+        unsubscribe=null;
+        $("app").style.display="none";
+        $("loginScreen").style.display="flex";
+        setFirebaseStatus("✓ Firebase connected · Please sign in","firebase-ok");
+      }
+    });
+  }catch(e){
+    console.error("Firebase initialization error:",e);
+    firebaseReady=false;
+    setFirebaseStatus("✕ Firebase connection failed","firebase-bad");
+    $("loginError").innerHTML=
+      "<strong>Firebase startup error:</strong> "+esc(e.message)+
+      "<br><span style='color:var(--muted)'>Open this file through a normal HTTPS website/Firebase Hosting and check your Firebase project configuration.</span>";
+  }
+}
+
+async function testFirebaseConnection(){
+  const btn=$("testFirebaseBtn");
+  if(btn) btn.disabled=true;
+  setFirebaseStatus("Testing Firebase services…","firebase-wait");
+  $("loginError").textContent="";
+  try{
+    if(!firebaseReady) throw new Error("Firebase SDK is not initialized.");
+
+    // Auth test: object exists and current user state is readable.
+    const authState = auth.currentUser ? "authenticated" : "authentication service ready";
+
+    // Firestore test: read the shared ledger document.
+    const snap=await docRef.get();
+
+    // Storage test: obtain a reference without downloading anything.
+    const storageReady=!!storage.ref();
+
+    setFirebaseStatus("✓ Firebase is working","firebase-ok");
+    $("loginError").innerHTML=
+      `<div class="status-box"><strong>Connection successful</strong><br>
+      Authentication: ${esc(authState)}<br>
+      Firestore: ${snap.exists?"ledger document found":"ledger document will be created after login"}<br>
+      Storage: ${storageReady?"ready":"not available"}</div>`;
+  }catch(e){
+    console.error("Firebase connection test:",e);
+    setFirebaseStatus("✕ Firebase test failed","firebase-bad");
+    $("loginError").innerHTML=
+      `<div class="status-box"><strong>Firebase test failed</strong><br>
+      ${esc(friendlyFirebaseError(e))}<br><br>
+      <strong>Check:</strong> Firestore is enabled, Storage is enabled, the Firebase project matches this config, and Firestore rules allow signed-in users.</div>`;
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+
+async function loadData(){
+  if(!firebaseReady || !currentUser) return;
+  try{
+    setFirebaseStatus("Loading shared business records…","firebase-wait");
+    const snap=await docRef.get();
+    if(snap.exists){
+      const d=snap.data()||{};
+      DATA.orders=Array.isArray(d.orders)?d.orders:[];
+      DATA.workers=Array.isArray(d.workers)?d.workers:[];
+      DATA.ownerLedger=Array.isArray(d.ownerLedger)?d.ownerLedger:[];
+      DATA.workerPayments=Array.isArray(d.workerPayments)?d.workerPayments:[];
+      DATA.documents=Array.isArray(d.documents)?d.documents:[];
+      DATA.settings={...DATA.settings,...(d.settings||{})};
+    }else{
+      await docRef.set({
+        orders:[],
+        workers:[],
+        ownerLedger:[],
+        workerPayments:[],
+        documents:[],
+        settings:DATA.settings,
+        createdAt:new Date().toISOString(),
+        createdBy:currentUser.email||""
+      });
+    }
+
+    setFirebaseStatus("✓ Shared records loaded","firebase-ok");
+
+    if(unsubscribe) unsubscribe();
+    unsubscribe=docRef.onSnapshot(s=>{
+      if(!s.exists) return;
+      const d=s.data()||{};
+      DATA.orders=Array.isArray(d.orders)?d.orders:[];
+      DATA.workers=Array.isArray(d.workers)?d.workers:[];
+      DATA.ownerLedger=Array.isArray(d.ownerLedger)?d.ownerLedger:[];
+      DATA.workerPayments=Array.isArray(d.workerPayments)?d.workerPayments:[];
+      DATA.documents=Array.isArray(d.documents)?d.documents:[];
+      DATA.settings={...DATA.settings,...(d.settings||{})};
+      renderAll();
+    },err=>console.error("Realtime listener",err));
+
+    renderAll();
+  }catch(e){
+    console.error("Load data error:",e);
+    setFirebaseStatus("✕ Could not load records","firebase-bad");
+    $("loginError").innerHTML=
+      "<div class='status-box'><strong>Could not load business records.</strong><br>"+
+      esc(friendlyFirebaseError(e))+
+      "<br><br>Check Firestore Database and its security rules.</div>";
+    showToast("Could not load business records.");
+  }
+}
+
+async function persist(key,value){
+  if(!firebaseReady || !currentUser) return false;
+  try{
+    await docRef.set({[key]:value},{merge:true});
+    return true;
+  }catch(e){
+    console.error("Firestore write error:",e);
+    showToast("Save failed: "+friendlyFirebaseError(e));
+    return false;
+  }
+}
+
+function renderAll(){
+  renderDashboard();
+  renderOrders();
+  renderWorkers();
+  renderOwners();
+  renderDocuments();
+  renderOwnerSelect();
+  renderOrderSelects();
+  renderSettings();
+  renderWorkerColors();
+}
+
+function showTab(id,btn){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));
+  $(id).classList.remove("hidden");
+  document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
+  const b=btn || document.querySelector(`.nav-btn[data-tab="${id}"]`);
+  if(b) b.classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function openOrderForm(order=null){
+  showTab("ordersTab");
+  $("orderFormCard").classList.remove("hidden");
+  $("orderFormTitle").textContent=order?"Edit Order":"New Order";
+  $("orderId").value=order?.id||"";
+  $("orderCustomer").value=order?.customer||"";
+  $("orderDesc").value=order?.desc||"";
+  $("orderDate").value=order?.date||today();
+  $("orderStatus").value=order?.status||"Pending";
+  $("orderAmount").value=order?.amount??"";
+  $("orderReceived").value=order?.received??0;
+  renderWorkerAssignments(order?.workerIds||[]);
+}
+function closeOrderForm(){ $("orderFormCard").classList.add("hidden"); $("orderForm").reset(); setDefaults(); }
+
+function renderWorkerAssignments(selected=[]){
+  const active=DATA.workers.filter(w=>w.active!==false);
+  $("noWorkerHint").textContent=active.length?"Select one or more workers responsible for this job.":"Add workers first from the Workers tab.";
+  $("workerAssignments").innerHTML=active.length?active.map(w=>`
+    <label class="worker-check">
+      <input type="checkbox" name="assignedWorker" value="${esc(w.id)}" ${selected.includes(w.id)?"checked":""}>
+      <span class="dot" style="background:${esc(w.color||WORKER_COLORS[0])}"></span>
+      <span><strong style="font-size:11px">${esc(w.name)}</strong><br><small style="color:var(--muted)">${esc(w.role||"Worker")}</small></span>
+    </label>
+  `).join(""):"";
+}
+
+$("orderForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const amount=Number($("orderAmount").value||0);
+  const received=Math.min(Number($("orderReceived").value||0),amount);
+  const workerIds=[...document.querySelectorAll('input[name="assignedWorker"]:checked')].map(x=>x.value);
+  const id=$("orderId").value||uid("ord");
+  const old=DATA.orders.find(x=>x.id===id);
+  const order={
+    id,customer:$("orderCustomer").value.trim(),desc:$("orderDesc").value.trim(),
+    date:$("orderDate").value,status:$("orderStatus").value,amount,received,workerIds,
+    createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()
+  };
+  const arr=DATA.orders.filter(x=>x.id!==id); arr.unshift(order);
+  loading(true,"Saving order...");
+  const ok=await persist("orders",arr);
+  loading(false);
+  if(ok){closeOrderForm();showToast("Order saved");}
+});
+
+function workerById(id){ return DATA.workers.find(w=>w.id===id); }
+function workerChips(ids=[]){
+  return ids.map(id=>workerById(id)).filter(Boolean).map(w=>`<span class="chip"><span class="dot" style="background:${esc(w.color||WORKER_COLORS[0])}"></span>${esc(w.name)} · ${esc(w.role||"Worker")}</span>`).join("");
+}
+
+function renderOrders(){
+  const q=($("orderSearch")?.value||"").toLowerCase().trim();
+  const filter=$("orderFilter")?.value||"All";
+  let arr=[...DATA.orders].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  arr=arr.filter(o=>{
+    const workers=(o.workerIds||[]).map(id=>workerById(id)?.name+" "+workerById(id)?.role).join(" ").toLowerCase();
+    const match=!q || `${o.customer} ${o.desc} ${workers}`.toLowerCase().includes(q);
+    return match&&(filter==="All"||o.status===filter);
+  });
+  $("ordersList").innerHTML=arr.length?arr.map(o=>{
+    const pending=Math.max(0,Number(o.amount||0)-Number(o.received||0));
+    const pct=o.amount?Math.min(100,Math.round(o.received/o.amount*100)):0;
+    const cls=o.status==="Completed"?"completed":o.status==="In progress"?"progress":"pending";
+    return `<div class="item">
+      <div class="item-top">
+        <div><div class="item-title">${esc(o.customer)}</div><div class="item-sub">${esc(o.desc||"No description")}<br>${dateText(o.date)}</div></div>
+        <div class="item-right"><div class="item-amount">${money(o.amount)}</div><span class="status ${cls}">${esc(o.status)}</span></div>
+      </div>
+      <div class="summary-line" style="margin-top:9px"><span>Received</span><strong>${money(o.received)}</strong></div>
+      <div class="summary-line"><span>Pending</span><strong>${money(pending)}</strong></div>
+      <div class="progress"><span style="width:${pct}%"></span></div>
+      <div class="meta">${workerChips(o.workerIds||[])||'<span class="chip">No workers assigned</span>'}</div>
+      <div class="item-actions">
+        <button class="btn btn-soft btn-small" onclick='openOrderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>Edit</button>
+        <button class="btn btn-danger btn-small" onclick="deleteOrder('${esc(o.id)}')">Delete</button>
+      </div>
+    </div>`;
+  }).join(""):'<div class="card empty">No orders found.</div>';
+}
+
+async function deleteOrder(id){
+  if(!confirm("Delete this order? Historical worker payment records will remain.")) return;
+  loading(true,"Deleting...");
+  const ok=await persist("orders",DATA.orders.filter(x=>x.id!==id));
+  loading(false); if(ok) showToast("Order deleted");
+}
+
+function toggleWorkerForm(show){
+  $("workerFormCard").classList.toggle("hidden",!show);
+  if(show){
+    $("workerForm").reset();$("workerId").value="";$("workerFormTitle").textContent="Add Worker";$("workerActive").value="true";renderWorkerColors();
+  }
+}
+function renderWorkerColors(selected=WORKER_COLORS[0]){
+  $("workerColors").innerHTML=WORKER_COLORS.map((c,i)=>`<label class="color-choice"><input type="radio" name="workerColor" value="${c}" ${c===selected?"checked":""}><span style="background:${c}"></span></label>`).join("");
+}
+
+$("workerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const id=$("workerId").value||uid("wrk");
+  const old=DATA.workers.find(w=>w.id===id);
+  const color=document.querySelector('input[name="workerColor"]:checked')?.value||WORKER_COLORS[0];
+  const worker={id,name:$("workerName").value.trim(),role:$("workerRole").value.trim(),phone:$("workerPhone").value.trim(),active:$("workerActive").value==="true",color,createdAt:old?.createdAt||new Date().toISOString()};
+  const arr=DATA.workers.filter(x=>x.id!==id);arr.push(worker);
+  loading(true,"Saving worker...");
+  const ok=await persist("workers",arr);loading(false);
+  if(ok){toggleWorkerForm(false);showToast("Worker saved");}
+});
+
+function editWorker(id){
+  const w=workerById(id);if(!w)return;
+  $("workerFormCard").classList.remove("hidden");
+  $("workerFormTitle").textContent="Edit Worker";
+  $("workerId").value=w.id;$("workerName").value=w.name;$("workerRole").value=w.role||"";
+  $("workerPhone").value=w.phone||"";$("workerActive").value=w.active===false?"false":"true";
+  renderWorkerColors(w.color||WORKER_COLORS[0]);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+async function deactivateWorker(id){
+  const w=workerById(id);if(!w)return;
+  const active=DATA.workers.map(x=>x.id===id?{...x,active:false}:x);
+  loading(true,"Updating worker...");
+  const ok=await persist("workers",active);loading(false);
+  if(ok)showToast("Worker marked inactive");
+}
+async function activateWorker(id){
+  const active=DATA.workers.map(x=>x.id===id?{...x,active:true}:x);
+  loading(true,"Activating worker...");
+  const ok=await persist("workers",active);loading(false);
+  if(ok)showToast("Worker activated");
+}
+
+function workerTotalPaid(id){return DATA.workerPayments.filter(p=>p.workerId===id).reduce((s,p)=>s+Number(p.amount||0),0);}
+function workerAssignments(id){return DATA.orders.filter(o=>(o.workerIds||[]).includes(id)).length;}
+
+function renderWorkers(){
+  const q=($("workerSearch")?.value||"").toLowerCase().trim(), f=$("workerStatusFilter")?.value||"all";
+  let arr=DATA.workers.filter(w=>(f==="all"||(f==="active"&&w.active!==false)||(f==="inactive"&&w.active===false))&&(!q||`${w.name} ${w.role} ${w.phone}`.toLowerCase().includes(q)));
+  $("workersList").innerHTML=arr.length?arr.map(w=>`
+    <div class="item worker-card">
+      <div class="worker-bar" style="background:${esc(w.color||WORKER_COLORS[0])}"></div>
+      <div class="worker-card-main">
+        <div class="item-top">
+          <div><div class="item-title">${esc(w.name)}</div><div class="item-sub">${esc(w.role||"Worker")}${w.phone?" · "+esc(w.phone):""}</div></div>
+          <span class="status ${w.active===false?"pending":"completed"}">${w.active===false?"Inactive":"Active"}</span>
+        </div>
+        <div class="meta"><span class="chip">${workerAssignments(w.id)} assigned jobs</span><span class="chip">${money(workerTotalPaid(w.id))} paid</span></div>
+        <div class="item-actions">
+          <button class="btn btn-soft btn-small" onclick="editWorker('${esc(w.id)}')">Edit</button>
+          ${w.active===false?`<button class="btn btn-green btn-small" onclick="activateWorker('${esc(w.id)}')">Activate</button>`:`<button class="btn btn-danger btn-small" onclick="deactivateWorker('${esc(w.id)}')">Deactivate</button>`}
+        </div>
+      </div>
+    </div>
+  `).join(""):'<div class="card empty">No workers found. Add your first worker type.</div>';
+}
+
+function renderOwnerSelect(){
+  $("ownerName").innerHTML=`<option value="owner1">${esc(DATA.settings.owner1)}</option><option value="owner2">${esc(DATA.settings.owner2)}</option>`;
+}
+$("ownerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const entry={id:uid("own"),owner:$("ownerName").value,type:$("ownerType").value,amount:Number($("ownerAmount").value||0),date:$("ownerDate").value,note:$("ownerNote").value.trim(),createdAt:new Date().toISOString()};
+  const arr=[entry,...DATA.ownerLedger];
+  loading(true,"Saving owner entry...");
+  const ok=await persist("ownerLedger",arr);loading(false);
+  if(ok){$("ownerForm").reset();$("ownerDate").value=today();showToast("Owner entry added");}
+});
+function ownerNet(key){
+  return DATA.ownerLedger.filter(x=>x.owner===key).reduce((s,x)=>s+(x.type==="in"?1:-1)*Number(x.amount||0),0);
+}
+function renderOwners(){
+  $("owner1SummaryName").textContent=DATA.settings.owner1+" Net";
+  $("owner2SummaryName").textContent=DATA.settings.owner2+" Net";
+  $("owner1Net").textContent=money(ownerNet("owner1"));
+  $("owner2Net").textContent=money(ownerNet("owner2"));
+  $("ownerTotalNet").textContent=money(ownerNet("owner1")+ownerNet("owner2"));
+  const arr=[...DATA.ownerLedger].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  $("ownersList").innerHTML=arr.length?arr.map(x=>`
+    <div class="item">
+      <div class="item-top">
+        <div><div class="item-title">${esc(x.owner==="owner1"?DATA.settings.owner1:DATA.settings.owner2)}</div><div class="item-sub">${dateText(x.date)} · ${esc(x.note||"No note")}</div></div>
+        <div class="item-amount" style="color:${x.type==="in"?"var(--green)":"var(--red)"}">${x.type==="in"?"+":"−"}${money(x.amount)}</div>
+      </div>
+      <div class="item-actions"><button class="btn btn-danger btn-small" onclick="deleteOwnerEntry('${esc(x.id)}')">Delete</button></div>
+    </div>
+  `).join(""):'<div class="card empty">No owner transactions yet.</div>';
+}
+async function deleteOwnerEntry(id){
+  if(!confirm("Delete this owner entry?"))return;
+  loading(true,"Deleting...");
+  const ok=await persist("ownerLedger",DATA.ownerLedger.filter(x=>x.id!==id));loading(false);
+  if(ok)showToast("Entry deleted");
+}
+
+function renderOrderSelects(){
+  $("docOrder").innerHTML='<option value="">No linked order</option>'+[...DATA.orders].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(o=>`<option value="${esc(o.id)}">${esc(o.customer)} · ${dateText(o.date)} · ${money(o.amount)}</option>`).join("");
+}
+
+function docIcon(type=""){
+  type=type.toLowerCase();
+  if(type.includes("pdf"))return "PDF";
+  if(type.includes("image"))return "IMG";
+  if(type.includes("sheet")||type.includes("excel")||type.includes("csv"))return "XLS";
+  if(type.includes("word")||type.includes("document"))return "DOC";
+  return "FILE";
+}
+function toggleDocumentForm(show){
+  $("documentFormCard").classList.toggle("hidden",!show);
+  if(show){$("documentForm").reset();$("docDate").value=today();renderOrderSelects();}
+}
+$("documentForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const file=$("docFile").files[0];
+  if(!file){showToast("Choose a file first");return;}
+  if(file.size>20*1024*1024){showToast("File is larger than 20 MB");return;}
+  if(!currentUser){showToast("Please sign in");return;}
+
+  const id=uid("doc");
+  const path=`documents/${currentUser.uid}/${id}_${safeName(file.name)}`;
+  const ref=storage.ref().child(path);
+  $("uploadProgressWrap").classList.remove("hidden");
+  $("uploadDocBtn").disabled=true;
+  $("uploadProgressText").textContent="Uploading 0%";
+  try{
+    const task=ref.put(file,{contentType:file.type||"application/octet-stream"});
+    task.on("state_changed",snap=>{
+      const pct=Math.round(snap.bytesTransferred/snap.totalBytes*100);
+      $("uploadProgress").style.width=pct+"%";
+      $("uploadProgressText").textContent=`Uploading ${pct}%`;
+    });
+    await task;
+    const url=await ref.getDownloadURL();
+    const orderId=$("docOrder").value||"";
+    const doc={
+      id,name:$("docName").value.trim(),category:$("docCategory").value,date:$("docDate").value,
+      orderId,fileName:file.name,fileType:file.type||"application/octet-stream",fileSize:file.size,
+      storagePath:path,url,uploadedBy:currentUser.email||"",uploadedAt:new Date().toISOString()
+    };
+    const ok=await persist("documents",[doc,...DATA.documents]);
+    if(ok){toggleDocumentForm(false);showToast("Document uploaded");}
+  }catch(err){
+    console.error(err);showToast("Document upload failed. Check Firebase Storage rules.");
+  }finally{
+    $("uploadDocBtn").disabled=false;
+    $("uploadProgressWrap").classList.add("hidden");
+    $("uploadProgress").style.width="0%";
+  }
+});
+
+function renderDocuments(){
+  const q=($("docSearch")?.value||"").toLowerCase().trim(), f=$("docFilter")?.value||"All";
+  let arr=[...DATA.documents].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  arr=arr.filter(d=>(f==="All"||d.category===f)&&(!q||`${d.name} ${d.category} ${d.fileName}`.toLowerCase().includes(q)));
+  $("documentsList").innerHTML=arr.length?arr.map(d=>{
+    const order=DATA.orders.find(o=>o.id===d.orderId);
+    return `<div class="item">
+      <div class="doc-row">
+        <div class="doc-icon">${esc(docIcon(d.fileType))}</div>
+        <div style="min-width:0;flex:1">
+          <div class="item-title" style="word-break:break-word">${esc(d.name)}</div>
+          <div class="item-sub">${esc(d.category)} · ${dateText(d.date)}<br>${esc(d.fileName)} · ${fileSize(Number(d.fileSize||0))}${order?"<br>Order: "+esc(order.customer):""}</div>
+          <div class="meta"><span class="chip">Uploaded by ${esc(d.uploadedBy||"Owner")}</span></div>
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-primary btn-small" onclick="openDocument('${esc(d.id)}')">Open</button>
+        <button class="btn btn-soft btn-small" onclick="downloadDocument('${esc(d.id)}')">Download</button>
+        <button class="btn btn-danger btn-small" onclick="deleteDocument('${esc(d.id)}')">Delete</button>
+      </div>
+    </div>`;
+  }).join(""):'<div class="card empty">No documents saved yet.</div>';
+}
+function openDocument(id){
+  const d=DATA.documents.find(x=>x.id===id);if(d?.url)window.open(d.url,"_blank","noopener");
+}
+function downloadDocument(id){
+  const d=DATA.documents.find(x=>x.id===id);if(!d?.url)return;
+  const a=document.createElement("a");a.href=d.url;a.target="_blank";a.rel="noopener";a.download=d.fileName||d.name;document.body.appendChild(a);a.click();a.remove();
+}
+async function deleteDocument(id){
+  const d=DATA.documents.find(x=>x.id===id);if(!d)return;
+  if(!confirm("Delete this document from the ledger and Firebase Storage?"))return;
+  loading(true,"Deleting document...");
+  try{
+    if(d.storagePath) await storage.ref().child(d.storagePath).delete().catch(()=>{});
+    const ok=await persist("documents",DATA.documents.filter(x=>x.id!==id));
+    if(ok)showToast("Document deleted");
+  }catch(e){console.error(e);showToast("Could not delete document");}
+  finally{loading(false);}
+}
+
+function renderSettings(){
+  $("setOwner1").value=DATA.settings.owner1||"Owner 1";
+  $("setOwner2").value=DATA.settings.owner2||"Owner 2";
+}
+$("settingsForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const settings={owner1:$("setOwner1").value.trim()||"Owner 1",owner2:$("setOwner2").value.trim()||"Owner 2"};
+  loading(true,"Saving settings...");
+  const ok=await persist("settings",settings);loading(false);
+  if(ok)showToast("Settings saved");
+});
+
+function renderDashboard(){
+  const orderValue=DATA.orders.reduce((s,o)=>s+Number(o.amount||0),0);
+  const received=DATA.orders.reduce((s,o)=>s+Number(o.received||0),0);
+  const pending=Math.max(0,orderValue-received);
+  const workerPaid=DATA.workerPayments.reduce((s,p)=>s+Number(p.amount||0),0);
+  const ownerFunds=ownerNet("owner1")+ownerNet("owner2");
+  const cash=received+ownerFunds-workerPaid;
+  const activeWorkers=DATA.workers.filter(w=>w.active!==false).length;
+
+  $("sReceived").textContent=money(received);
+  $("sOrderValue").textContent=money(orderValue);
+  $("sPending").textContent=money(pending);
+  $("sWorkerPaid").textContent=money(workerPaid);
+  $("sOwnerFunds").textContent=money(ownerFunds);
+  $("sCash").textContent=money(cash);
+  $("sWorkers").textContent=DATA.workers.length;
+  $("sWorkersNote").textContent=`${activeWorkers} active · ${DATA.workers.length-activeWorkers} inactive`;
+  $("sDocs").textContent=DATA.documents.length;
+
+  const activities=[];
+  DATA.orders.forEach(o=>activities.push({date:o.date||"",html:`<strong>Order:</strong> ${esc(o.customer)} · ${money(o.amount)}`}));
+  DATA.ownerLedger.forEach(o=>activities.push({date:o.date||"",html:`<strong>Owner:</strong> ${esc(o.owner==="owner1"?DATA.settings.owner1:DATA.settings.owner2)} ${o.type==="in"?"put in":"took out"} ${money(o.amount)}`}));
+  DATA.workerPayments.forEach(p=>activities.push({date:p.date||"",html:`<strong>Worker payment:</strong> ${esc(workerById(p.workerId)?.name||"Unknown worker")} · ${money(p.amount)}`}));
+  DATA.documents.forEach(d=>activities.push({date:d.date||"",html:`<strong>Document:</strong> ${esc(d.name)}`}));
+  activities.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  $("recentActivity").innerHTML=activities.slice(0,8).map(a=>`<div class="item"><div class="item-sub">${dateText(a.date)}</div><div style="margin-top:4px;font-size:12px">${a.html}</div></div>`).join("")||'<div class="card empty">No activity yet.</div>';
+}
+
+/* Worker payment modal-like inline card */
+function addWorkerPayment(){
+  const html=`
+    <div class="card" id="paymentTempCard">
+      <div class="section-head" style="margin-top:0"><div><h2>Worker Payment</h2><p>Record money paid to a specific worker</p></div><button class="icon-btn" onclick="closePaymentForm()">×</button></div>
+      <form id="paymentForm">
+        <div class="form-grid">
+          <div><label>Worker</label><select id="payWorker">${DATA.workers.map(w=>`<option value="${esc(w.id)}">${esc(w.name)} · ${esc(w.role||"Worker")}</option>`).join("")}</select></div>
+          <div><label>Amount</label><input id="payAmount" type="number" min="0" step="0.01" required></div>
+          <div><label>Date</label><input id="payDate" type="date" value="${today()}" required></div>
+          <div><label>Related Order</label><select id="payOrder"><option value="">No linked order</option>${DATA.orders.map(o=>`<option value="${esc(o.id)}">${esc(o.customer)} · ${money(o.amount)}</option>`).join("")}</select></div>
+          <div class="full"><label>Note</label><input id="payNote" placeholder="Advance, final payment, daily work..."></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-primary">Save Payment</button></div>
+      </form>
+    </div>`;
+  $("workersList").insertAdjacentHTML("beforebegin",html);
+  $("paymentForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const p={id:uid("pay"),workerId:$("payWorker").value,amount:Number($("payAmount").value||0),date:$("payDate").value,orderId:$("payOrder").value,note:$("payNote").value.trim(),createdAt:new Date().toISOString()};
+    loading(true,"Saving payment...");
+    const ok=await persist("workerPayments",[p,...DATA.workerPayments]);loading(false);
+    if(ok){closePaymentForm();showToast("Worker payment saved");}
+  });
+}
+function closePaymentForm(){ $("paymentTempCard")?.remove(); }
+function renderWorkerPaymentsSection(){
+  // Kept as a function so the payment ledger can be integrated below workers.
+}
+
+async function deleteWorkerPayment(id){
+  if(!confirm("Delete this payment?"))return;
+  loading(true,"Deleting...");
+  const ok=await persist("workerPayments",DATA.workerPayments.filter(x=>x.id!==id));loading(false);
+  if(ok)showToast("Payment deleted");
+}
+
+/* Add payment button + payment ledger after worker list */
+const originalRenderWorkers=renderWorkers;
+renderWorkers=function(){
+  originalRenderWorkers();
+  const list=$("workersList");
+  const payments=[...DATA.workerPayments].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  const wrap=document.createElement("div");
+  wrap.innerHTML=`
+    <div class="section-head" style="margin-top:25px">
+      <div><h2>Payments</h2><p>Worker-wise payment history</p></div>
+      <button class="btn btn-rust" onclick="addWorkerPayment()">+ Payment</button>
+    </div>
+    <div class="list">${payments.length?payments.map(p=>`
+      <div class="item">
+        <div class="item-top">
+          <div><div class="item-title">${esc(workerById(p.workerId)?.name||"Unknown worker")}</div><div class="item-sub">${esc(workerById(p.workerId)?.role||"Worker")} · ${dateText(p.date)}${p.note?"<br>"+esc(p.note):""}</div></div>
+          <div class="item-right"><div class="item-amount">${money(p.amount)}</div></div>
+        </div>
+        ${p.orderId?`<div class="meta"><span class="chip">Order: ${esc(DATA.orders.find(o=>o.id===p.orderId)?.customer||"Unknown")}</span></div>`:""}
+        <div class="item-actions"><button class="btn btn-danger btn-small" onclick="deleteWorkerPayment('${esc(p.id)}')">Delete</button></div>
+      </div>
+    `).join(""):'<div class="card empty">No worker payments recorded yet.</div>'}</div>`;
+  list.appendChild(wrap);
+};
+
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  $("loginError").textContent="";
+  if(!firebaseReady || !auth){
+    $("loginError").textContent="Firebase is not ready yet. Tap “Test Firebase Connection”.";
+    return;
+  }
+
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+  const btn=$("loginBtn");
+  btn.disabled=true;
+  btn.textContent="Signing in…";
+  setFirebaseStatus("Signing in…","firebase-wait");
+
+  try{
+    await auth.signInWithEmailAndPassword(email,password);
+    $("loginError").textContent="";
+  }catch(err){
+    console.error("Login error:",err);
+    setFirebaseStatus("✕ Sign-in failed","firebase-bad");
+    $("loginError").innerHTML="<div class='status-box'>"+esc(friendlyFirebaseError(err))+"</div>";
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Sign In with Email";
+  }
+});
+
+
+$("googleBtn").addEventListener("click",async()=>{
+  $("loginError").textContent="";
+  if(!firebaseReady || !auth){
+    $("loginError").textContent="Firebase is not ready yet. Tap “Test Firebase Connection”.";
+    return;
+  }
+
+  const btn=$("googleBtn");
+  btn.disabled=true;
+  btn.innerHTML='<span class="google-g">G</span> Opening Google…';
+  setFirebaseStatus("Opening Google sign-in…","firebase-wait");
+
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({prompt:"select_account"});
+    await auth.signInWithPopup(provider);
+    $("loginError").textContent="";
+  }catch(err){
+    console.error("Google login error:",err);
+    setFirebaseStatus("✕ Google sign-in failed","firebase-bad");
+    let msg=friendlyFirebaseError(err);
+
+    const code=err?.code||"";
+    if(code==="auth/popup-blocked"){
+      msg="Google sign-in popup was blocked. Allow popups for this website and try again.";
+    }else if(code==="auth/popup-closed-by-user"){
+      msg="Google sign-in was cancelled.";
+    }else if(code==="auth/unauthorized-domain"){
+      msg="This website domain is not authorized in Firebase. Add the current domain under Firebase Authentication → Settings → Authorized domains.";
+    }else if(code==="auth/operation-not-allowed"){
+      msg="Google sign-in is not enabled. In Firebase Authentication → Sign-in method, enable Google.";
+    }else if(code==="auth/account-exists-with-different-credential"){
+      msg="This Google email already has an account using another sign-in method. Sign in with that method first.";
+    }else if(code==="auth/network-request-failed"){
+      msg="Network error while contacting Google/Firebase. Check your internet connection.";
+    }
+
+    $("loginError").innerHTML="<div class='status-box'><strong>Google sign-in failed</strong><br>"+esc(msg)+"</div>";
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<span class="google-g">G</span> Continue with Google';
+  }
+});
+
+$("forgotBtn").addEventListener("click",async()=>{
+  const email=$("loginEmail").value.trim();
+  if(!email){
+    $("loginError").textContent="Enter your owner email first.";
+    $("loginEmail").focus();
+    return;
+  }
+  if(!firebaseReady || !auth){
+    $("loginError").textContent="Firebase is not ready yet.";
+    return;
+  }
+  try{
+    await auth.sendPasswordResetEmail(email);
+    $("loginError").innerHTML="<div class='status-box'>Password reset email sent to <strong>"+esc(email)+"</strong>. Check the inbox and spam folder.</div>";
+  }catch(err){
+    console.error(err);
+    $("loginError").innerHTML="<div class='status-box'>"+esc(friendlyFirebaseError(err))+"</div>";
+  }
+});
+
+$("testFirebaseBtn").addEventListener("click",testFirebaseConnection);
+
+async function logout(){
+  try{
+    if(auth) await auth.signOut();
+  }catch(e){
+    console.error(e);
+    showToast("Could not sign out.");
+  }
+}
+
+setDefaults();
+initFirebase();
+
+/* =========================================================
+   GOOGLE SIGN-IN NOTE
+    ---------------------------------------------------------
+    Enable Google under Firebase Authentication > Sign-in method.
+    Add your hosted website domain under Authentication > Settings > Authorized domains.
+
+    FIRESTORE RULES
+   ---------------------------------------------------------
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /gurukrupa/{doc} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+
+   STORAGE RULES
+   ---------------------------------------------------------
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /documents/{allPaths=**} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   ========================================================= */
+</script>
+</body>
+</html>
